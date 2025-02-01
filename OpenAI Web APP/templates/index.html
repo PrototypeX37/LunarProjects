@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>O1 Chat Interface – Enhanced &amp; Exciting</title>
+    <!-- Google Fonts: Inter for body text and Space Mono for headings -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Prism CSS for code highlighting -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <!-- Prism JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <!-- Particles.js library -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+      /* Color scheme variables with neon glow and glass effects */
+      :root {
+        --bg-primary: #0d0d0d;
+        --bg-secondary: rgba(20, 20, 20, 0.85);
+        --bg-tertiary: rgba(255, 255, 255, 0.1);
+        --text-primary: #f0f0f0;
+        --text-secondary: #c4c4c4;
+        --accent-primary: #ff4ecd;
+        --accent-secondary: #52d2ff;
+        --extra-accent: #ffcc00;
+        --success: #23d18b;
+        --error: #f07178;
+        --code-bg: #1e1e2e;
+      }
+      /* Global reset, box-sizing and base font */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: radial-gradient(
+            circle at 20% 20%,
+            rgba(30, 30, 40, 0.8),
+            #0d0d0d 80%
+          ),
+          linear-gradient(135deg, #1e1e40, #0d0d0d);
+        color: var(--text-primary);
+        line-height: 1.6;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      /* Particles container covers the entire background */
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 0;
+      }
+      /* Main container splits the page into sidebar and content area */
+      .container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 1;
+      }
+      /* Sidebar: Chat History */
+      .chat-history {
+        width: 300px;
+        background: rgba(20, 20, 20, 0.8);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(10px);
+        transition: background 0.3s ease;
+      }
+      .chat-history:hover {
+        background: rgba(20, 20, 20, 0.95);
+      }
+      .chat-history h2 {
+        font-family: 'Space Mono', monospace;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--accent-primary);
+      }
+      .chat-history ul {
+        list-style: none;
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+      }
+      .chat-session {
+        padding: 0.75rem;
+        border: 1px solid transparent;
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: background 0.25s ease, border-color 0.25s ease;
+        position: relative;
+      }
+      .chat-session:hover,
+      .chat-session.active {
+        background: var(--bg-tertiary);
+        border-color: var(--accent-secondary);
+      }
+      .chat-session button.delete-session-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--error);
+        color: #fff;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      .chat-session:hover button.delete-session-btn {
+        opacity: 1;
+      }
+      /* New Chat Button */
+      .new-chat-btn {
+        background: var(--accent-secondary);
+        color: var(--bg-primary);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.25s ease, transform 0.25s ease;
+        font-family: 'Space Mono', monospace;
+      }
+      .new-chat-btn:hover {
+        background: var(--accent-primary);
+        transform: scale(1.05);
+      }
+      /* Chat content area */
+      .chat-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem 1.5rem;
+        gap: 1rem;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--bg-tertiary);
+      }
+      header h1 {
+        font-family: 'Space Mono', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      header svg {
+        filter: drop-shadow(0 2px 4px var(--accent-secondary));
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .header-actions button {
+        background: var(--accent-secondary);
+        color: var(--bg-primary);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.25s ease, transform 0.25s ease;
+        font-family: 'Space Mono', monospace;
+      }
+      .header-actions button:hover {
+        background: var(--accent-primary);
+        transform: scale(1.05);
+      }
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        overflow: hidden;
+      }
+      /* Chat Container with advanced glass look and animated gradient border */
+      #chat-container {
+        flex: 1;
+        background: rgba(20, 20, 20, 0.7);
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        animation: fadeInUp 0.5s ease forwards;
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      #chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      /* Message bubbles */
+      .message {
+        max-width: 85%;
+        padding: 1rem;
+        border-radius: 1rem;
+        position: relative;
+        animation: messageAppear 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        word-wrap: break-word;
+      }
+      @keyframes messageAppear {
+        from {
+          opacity: 0;
+          transform: translateY(15px) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .message.user {
+        background: rgba(255, 76, 205, 0.3);
+        align-self: flex-end;
+        border-bottom-right-radius: 0.25rem;
+        box-shadow: 0 4px 8px rgba(255, 76, 205, 0.25);
+      }
+      .message.user::after {
+        content: "";
+        position: absolute;
+        right: -10px;
+        bottom: 12px;
+        border-top: 10px solid transparent;
+        border-left: 10px solid rgba(255, 76, 205, 0.3);
+        border-bottom: 10px solid transparent;
+      }
+      .message.assistant {
+        background: rgba(82, 210, 255, 0.3);
+        align-self: flex-start;
+        border-bottom-left-radius: 0.25rem;
+        box-shadow: 0 4px 8px rgba(82, 210, 255, 0.25);
+      }
+      .message.assistant::after {
+        content: "";
+        position: absolute;
+        left: -10px;
+        bottom: 12px;
+        border-top: 10px solid transparent;
+        border-right: 10px solid rgba(82, 210, 255, 0.3);
+        border-bottom: 10px solid transparent;
+      }
+      .message.error {
+        background-color: var(--error);
+        color: #fff;
+        align-self: center;
+      }
+      .message .content {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      /* Code block styling */
+      .code-block {
+        margin: 1rem 0;
+        position: relative;
+        background: var(--code-bg);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background: rgba(0, 0, 0, 0.3);
+      }
+      .code-language {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+      }
+      /* Updated to wrap long lines */
+      .code-block pre {
+        margin: 0 !important;
+        padding: 1rem !important;
+        background: transparent !important;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-width: 100%;
+      }
+      .code-block code {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+      .copy-button {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-secondary);
+        border: none;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: background 0.25s ease, color 0.25s ease;
+      }
+      .copy-button:hover {
+        background: var(--accent-secondary);
+        color: var(--bg-primary);
+      }
+      /* Input area styling */
+      .input-area {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 1rem;
+        padding: 1rem;
+        display: flex;
+        gap: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+      }
+      textarea {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        resize: none;
+        font-family: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+        min-height: 60px;
+        max-height: 300px;
+        overflow-y: auto;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 8px var(--accent-primary);
+      }
+      button#send-button {
+        background-color: var(--accent-primary);
+        color: var(--bg-primary);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s ease, background-color 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      button#send-button:hover {
+        transform: scale(1.1);
+        background-color: var(--accent-secondary);
+        box-shadow: 0 0 15px var(--accent-secondary);
+      }
+      /* Token usage info area */
+      #token-info {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        display: flex;
+        gap: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        animation: fadeInUp 0.5s ease;
+      }
+      .token-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      /* Loading indicator styling (now styled as an assistant bubble) */
+      .loading {
+        /* no self-alignment override so that it inherits assistant styling */
+        padding: 1rem;
+        background: rgba(82, 210, 255, 0.3);
+        border-bottom-left-radius: 0.25rem;
+        box-shadow: 0 4px 8px rgba(82, 210, 255, 0.25);
+        animation: fadeInUp 0.5s ease;
+      }
+      .typing-indicator {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        background-color: var(--accent-primary);
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out;
+      }
+      .typing-indicator span:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+      .typing-indicator span:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: scale(0);
+        }
+        40% {
+          transform: scale(1);
+        }
+      }
+      /* Custom scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-primary);
+      }
+      @media (max-width: 768px) {
+        .chat-history {
+          display: none;
+        }
+        .chat-content {
+          padding: 0.5rem;
+        }
+        .message {
+          max-width: 90%;
+        }
+      }
+      /* Enhanced Footer styling */
+      footer {
+        position: relative;
+        z-index: 1;
+        background: linear-gradient(
+          135deg,
+          rgba(52, 52, 52, 0.95),
+          rgba(20, 20, 20, 0.95)
+        );
+        padding: 1rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        animation: footerFadeIn 1s ease forwards;
+      }
+      footer .social-links a {
+        margin: 0 0.5rem;
+        color: var(--accent-secondary);
+        text-decoration: none;
+        transition: transform 0.3s ease, color 0.3s ease;
+      }
+      footer .social-links a:hover {
+        transform: scale(1.1);
+        color: var(--accent-primary);
+      }
+      @keyframes footerFadeIn {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      /* Modal styling for the game */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background: rgba(0, 0, 0, 0.7);
+      }
+      .modal-content {
+        background-color: var(--bg-secondary);
+        margin: 5% auto;
+        padding: 2rem;
+        border: 1px solid var(--bg-tertiary);
+        width: 90%;
+        max-width: 500px;
+        border-radius: 1rem;
+        position: relative;
+        text-align: center;
+      }
+      .close-button {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+      }
+      /* Additional styling for advanced RPG modal */
+      #rpg-stats {
+        text-align: left;
+        margin: 1rem 0;
+        font-family: monospace;
+      }
+      #rpg-stats div {
+        margin: 0.25rem 0;
+      }
+      #rpg-log {
+        background: rgba(0,0,0,0.2);
+        height: 120px;
+        overflow-y: auto;
+        text-align: left;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        font-family: monospace;
+        font-size: 0.9rem;
+      }
+      .rpg-actions button {
+        margin: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-family: 'Space Mono', monospace;
+      }
+      .rpg-actions button:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Particles background -->
+    <div id="particles-js"></div>
+    <div class="container">
+      <!-- Sidebar: Chat History -->
+      <aside class="chat-history">
+        <h2>Chat History</h2>
+        <ul id="history-list">
+          <!-- Chat session items will be injected here -->
+        </ul>
+        <button id="new-chat" class="new-chat-btn">New Chat</button>
+      </aside>
+      <!-- Main Chat Content -->
+      <section class="chat-content">
+        <!-- Header with Title, Token Info and Chat Controls -->
+        <header>
+          <h1>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
+            o3-mini Chat Interface
+          </h1>
+          <div class="header-actions">
+            <div id="token-info"></div>
+            <button id="clear-history">Clear Session</button>
+            <button id="play-game">Play Game</button>
+          </div>
+        </header>
+        <main>
+          <!-- Chat Container -->
+          <div id="chat-container">
+            <div id="chat-messages"></div>
+          </div>
+          <!-- Input Area -->
+          <div class="input-area">
+            <textarea
+              id="user-input"
+              placeholder="Type your message here... (Enter to send, Shift+Enter for a new line)"
+              rows="1"
+            ></textarea>
+            <button id="send-button">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </main>
+      </section>
+    </div>
+    <!-- Enhanced Footer with Credits and Social Links -->
+    <footer>
+      <div>
+        Credits: Discord itslunar •
+        <a href="https://discord.gg/fablerpg" target="_blank">FableRPG Discord</a>
+      </div>
+      <div class="social-links">
+        <a href="https://github.com/prototypeX37" target="_blank">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 012 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+      </div>
+    </footer>
+    <!-- Advanced RPG Game Modal -->
+    <div id="game-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Advanced RPG Adventure!</h2>
+        <p id="rpg-description">
+          A fearsome enemy approaches! Choose your strategy wisely.
+        </p>
+        <div id="rpg-stats">
+          <div>Player HP: <span id="player-hp"></span> / <span id="player-maxhp"></span></div>
+          <div>Player MP: <span id="player-mp"></span> / <span id="player-maxmp"></span></div>
+          <div>Enemy HP: <span id="enemy-hp"></span> / <span id="enemy-maxhp"></span></div>
+        </div>
+        <div class="rpg-actions">
+          <button id="attack-btn" style="background: var(--accent-secondary); color: var(--bg-primary);">Attack</button>
+          <button id="magic-btn" style="background: var(--extra-accent); color: var(--bg-primary);">Cast Spell</button>
+          <button id="heal-btn" style="background: var(--success); color: var(--bg-primary);">Heal</button>
+        </div>
+        <div id="rpg-log"></div>
+        <button id="rpg-restart-btn" style="margin-top:1rem; padding:0.5rem 1rem; background: var(--accent-primary); border:none; border-radius:0.5rem; cursor:pointer; display:none;">
+          Restart Battle
+        </button>
+      </div>
+    </div>
+    <script>
+      // Chat/App code
+      let currentConversation = [];
+      let fullChatHistory =
+        JSON.parse(localStorage.getItem("fullChatHistory")) || [];
+
+      // Helper: Save full history to localStorage
+      function saveFullHistory() {
+        localStorage.setItem("fullChatHistory", JSON.stringify(fullChatHistory));
+      }
+
+      // Load a session into the chat window
+      function loadSession(session) {
+        currentConversation = session.conversation;
+        document.getElementById("chat-messages").innerHTML = "";
+        currentConversation.forEach((msg) =>
+          displayMessage(msg.role, msg.content)
+        );
+        updateTokenInfo(session.usage);
+        // Highlight the active session
+        document.querySelectorAll(".chat-session").forEach((item) => {
+          item.classList.remove("active");
+          if (item.dataset.id === session.id) item.classList.add("active");
+        });
+      }
+
+      // Render chat history in the sidebar
+      function renderHistory() {
+        const historyList = document.getElementById("history-list");
+        historyList.innerHTML = "";
+        fullChatHistory.forEach((session, index) => {
+          const li = document.createElement("li");
+          li.className = "chat-session";
+          li.dataset.id = session.id;
+
+          const titleSpan = document.createElement("span");
+          titleSpan.textContent = session.title || "Untitled Chat";
+          titleSpan.style.cursor = "pointer";
+          titleSpan.addEventListener("click", () => {
+            loadSession(session);
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "Delete";
+          deleteBtn.className = "delete-session-btn";
+
+          deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (
+              confirm("Are you sure you want to delete this chat session?")
+            ) {
+              fullChatHistory.splice(index, 1);
+              saveFullHistory();
+              renderHistory();
+            }
+          });
+
+          li.appendChild(titleSpan);
+          li.appendChild(deleteBtn);
+          historyList.appendChild(li);
+        });
+      }
+
+      // Create a new chat session
+      function newChat() {
+        if (currentConversation.length) {
+          if (
+            confirm(
+              "Do you want to save this conversation before starting a new one?"
+            )
+          ) {
+            const title = prompt(
+              "Enter a title for this chat session:",
+              "Chat " + new Date().toLocaleString()
+            );
+            const session = {
+              id: Date.now().toString(),
+              title: title || "Untitled Chat",
+              conversation: currentConversation,
+              usage: {}
+            };
+            fullChatHistory.push(session);
+            saveFullHistory();
+            renderHistory();
+          }
+        }
+        currentConversation = [];
+        document.getElementById("chat-messages").innerHTML = "";
+        updateTokenInfo({});
+
+        document.querySelectorAll(".chat-session").forEach((item) => {
+          item.classList.remove("active");
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        renderHistory();
+
+        const sendButton = document.getElementById("send-button");
+        const userInput = document.getElementById("user-input");
+        const clearHistoryBtn = document.getElementById("clear-history");
+        const newChatBtn = document.getElementById("new-chat");
+        const playGameBtn = document.getElementById("play-game");
+
+        sendButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          handleSend();
+        });
+
+        userInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+          }
+        });
+
+        // Auto-resize for textarea
+        userInput.addEventListener("input", function () {
+          this.style.height = "auto";
+          const maxHeight = 300;
+          if (this.scrollHeight > maxHeight) {
+            this.style.height = maxHeight + "px";
+            this.style.overflowY = "auto";
+          } else {
+            this.style.height = this.scrollHeight + "px";
+            this.style.overflowY = "hidden";
+          }
+        });
+
+        clearHistoryBtn.addEventListener("click", function () {
+          if (confirm("Are you sure you want to clear this session?")) {
+            currentConversation = [];
+            document.getElementById("chat-messages").innerHTML = "";
+          }
+        });
+
+        newChatBtn.addEventListener("click", function () {
+          newChat();
+        });
+
+        // Game modal open/close and advanced RPG game initialization
+        playGameBtn.addEventListener("click", function () {
+          document.getElementById("game-modal").style.display = "block";
+          startAdvancedRpg();
+        });
+        document.querySelector(".close-button").addEventListener("click", function () {
+          document.getElementById("game-modal").style.display = "none";
+        });
+        window.addEventListener("click", function (e) {
+          if (e.target == document.getElementById("game-modal")) {
+            document.getElementById("game-modal").style.display = "none";
+          }
+        });
+
+        // Initialize particles.js
+        particlesJS("particles-js", {
+          particles: {
+            number: {
+              value: 80,
+              density: { enable: true, value_area: 800 }
+            },
+            color: { value: "#ffffff" },
+            shape: {
+              type: "circle",
+              stroke: { width: 0, color: "#000000" },
+              polygon: { nb_sides: 5 }
+            },
+            opacity: {
+              value: 0.5,
+              random: false,
+              anim: { enable: false }
+            },
+            size: {
+              value: 3,
+              random: true,
+              anim: { enable: false }
+            },
+            line_linked: {
+              enable: true,
+              distance: 150,
+              color: "#ffffff",
+              opacity: 0.4,
+              width: 1
+            },
+            move: {
+              enable: true,
+              speed: 4,
+              direction: "none",
+              random: false,
+              straight: false,
+              out_mode: "out",
+              bounce: false
+            }
+          },
+          interactivity: {
+            detect_on: "canvas",
+            events: {
+              onhover: { enable: true, mode: "repulse" },
+              onclick: { enable: true, mode: "push" },
+              resize: true
+            },
+            modes: {
+              repulse: { distance: 100, duration: 0.4 },
+              push: { particles_nb: 4 }
+            }
+          },
+          retina_detect: true
+        });
+      });
+
+      function handleSend() {
+        const userInput = document.getElementById("user-input");
+        const message = userInput.value.trim();
+        if (!message) return;
+        userInput.value = "";
+        userInput.style.height = "auto";
+
+        displayMessage("user", message);
+        currentConversation.push({ role: "user", content: message });
+
+        sendToServer();
+      }
+
+      async function sendToServer() {
+        const loadingId = displayLoadingIndicator();
+        try {
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messages: currentConversation })
+          });
+          const data = await response.json();
+          removeLoadingIndicator(loadingId);
+          if (data.error) {
+            displayMessage("error", data.error);
+          } else {
+            currentConversation.push({
+              role: "assistant",
+              content: data.response
+            });
+            displayMessage("assistant", data.response);
+            updateTokenInfo(data.usage);
+          }
+        } catch (error) {
+          removeLoadingIndicator(loadingId);
+          displayMessage("error", "An error occurred while processing your request.");
+        }
+      }
+
+      function displayMessage(role, content) {
+        const messagesDiv = document.getElementById("chat-messages");
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${role}`;
+
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "content";
+
+        if (isCodeContent(content)) {
+          contentDiv.innerHTML = formatCodeBlock(content);
+        } else {
+          contentDiv.textContent = content;
+        }
+
+        messageDiv.appendChild(contentDiv);
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        Prism.highlightAll();
+      }
+
+      function isCodeContent(content) {
+        const markerRegex = /-{5,}/;
+        return markerRegex.test(content);
+      }
+
+      function formatCodeBlock(content) {
+        const markerRegex = /-{5,}/;
+        const parts = content.split(markerRegex);
+        if (parts.length !== 3) return content;
+        let beforeText = parts[0].trim();
+        let codeContent = parts[1].trim();
+        let afterText = parts[2].trim();
+
+        let language = detectLanguage(codeContent);
+
+        const escapedCode = codeContent
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+
+        let formattedContent = "";
+        if (beforeText)
+          formattedContent += beforeText + "<br><br>";
+        formattedContent += `
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-language">${language}</span>
+              <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code class="language-${language}">${escapedCode}</code></pre>
+          </div>`;
+        if (afterText)
+          formattedContent += "<br>" + afterText;
+        return formattedContent;
+      }
+
+      function copyCode(button) {
+        const code = button.parentElement.parentElement.querySelector("code")
+          .textContent;
+        navigator.clipboard.writeText(code);
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = "Copy";
+        }, 2000);
+      }
+
+      // Modified loading indicator to look like an assistant bubble
+      function displayLoadingIndicator() {
+        const id = "loading-" + Date.now();
+        const messagesDiv = document.getElementById("chat-messages");
+        const loadingDiv = document.createElement("div");
+        loadingDiv.id = id;
+        loadingDiv.className = "message assistant loading";
+        loadingDiv.innerHTML =
+          '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+        messagesDiv.appendChild(loadingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return id;
+      }
+
+      function removeLoadingIndicator(id) {
+        document.getElementById(id)?.remove();
+      }
+
+      function detectLanguage(code) {
+        const firstLine = code.split("\n")[0];
+        if (firstLine.startsWith("#!/")) {
+          const match = firstLine.match(/\/env\s+(\w+)/);
+          if (match) {
+            const langMap = {
+              python3: "python",
+              python2: "python",
+              python: "python",
+              node: "javascript",
+              bash: "bash",
+              sh: "shell",
+              ruby: "ruby"
+            };
+            return langMap[match[1]] || match[1];
+          }
+        }
+        const patterns = {
+          python: [
+            /\bimport\s+[\w\s,]+\b/,
+            /\bdef\s+\w+\s*\(/,
+            /\bclass\s+\w+[:\(]/,
+            /@\w+/,
+            /\bprint\s*\(/
+          ],
+          javascript: [
+            /\b(const|let|var)\s+\w+/,
+            /\bfunction\s+\w+\s*\(/,
+            /=>\s*{/,
+            /\bconsole\.(log|warn|error)\(/
+          ],
+          java: [
+            /\bpublic\s+class\s+\w+/,
+            /\bprivate\s+\w+\s+\w+/,
+            /\bprotected\s+\w+\s+\w+/
+          ]
+        };
+        for (const [lang, tests] of Object.entries(patterns)) {
+          if (tests.some((pattern) => pattern.test(code))) return lang;
+        }
+        return "text";
+      }
+
+      function updateTokenInfo(usage) {
+        if (!usage) usage = {};
+        const tokenInfo = document.getElementById("token-info");
+        tokenInfo.innerHTML = `
+          <div class="token-detail" title="Total Tokens Used">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 7h-4V3c0-.6-.4-1-1-1H9c-.6 0-1 .4-1 1v4H4c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1h4v4c0 .6.4 1 1 1h6c.6 0 1-.4 1-1v-4h4c.6 0 1-.4 1-1V8c0-.6-.4-1-1-1z"/>
+            </svg>
+            <span>${usage.total_tokens || 0}</span>
+          </div>
+          <div class="token-detail" title="Reasoning Tokens">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            <span>${usage?.completion_tokens_details?.reasoning_tokens || 0}</span>
+          </div>
+        `;
+      }
+
+      // Advanced RPG game code
+      let playerMaxHP = 120;
+      let playerHP = 120;
+      let playerMaxMP = 50;
+      let playerMP = 50;
+      let enemyMaxHP = 100;
+      let enemyHP = 100;
+      let gameActive = false;
+
+      function logRpg(message) {
+        const logDiv = document.getElementById("rpg-log");
+        logDiv.innerHTML += message + "<br>";
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+
+      function updateRpgDisplay() {
+        document.getElementById("player-hp").textContent = playerHP;
+        document.getElementById("player-maxhp").textContent = playerMaxHP;
+        document.getElementById("player-mp").textContent = playerMP;
+        document.getElementById("player-maxmp").textContent = playerMaxMP;
+        document.getElementById("enemy-hp").textContent = enemyHP;
+        document.getElementById("enemy-maxhp").textContent = enemyMaxHP;
+      }
+
+      function startAdvancedRpg() {
+        // Reset stats and log
+        playerHP = playerMaxHP;
+        playerMP = playerMaxMP;
+        enemyHP = enemyMaxHP;
+        gameActive = true;
+        document.getElementById("rpg-log").innerHTML = "";
+        updateRpgDisplay();
+        logRpg("Battle start! Your enemy stands before you.");
+        document.getElementById("rpg-restart-btn").style.display = "none";
+      }
+
+      // Player action: Attack
+      document.getElementById("attack-btn").addEventListener("click", function () {
+        if (!gameActive) return;
+        // Player attack: 15-25 damage
+        const damage = Math.floor(Math.random() * 11) + 15;
+        enemyHP = Math.max(enemyHP - damage, 0);
+        logRpg(`You attack the enemy for ${damage} damage.`);
+        updateRpgDisplay();
+        if (enemyHP === 0) { endBattle("win"); return; }
+        enemyTurn();
+      });
+
+      // Player action: Magic - consumes MP
+      document.getElementById("magic-btn").addEventListener("click", function () {
+        if (!gameActive) return;
+        if (playerMP < 10) {
+          logRpg("Not enough MP to cast a spell!");
+          return;
+        }
+        playerMP -= 10;
+        // Magic attack: 20-35 damage
+        const damage = Math.floor(Math.random() * 16) + 20;
+        enemyHP = Math.max(enemyHP - damage, 0);
+        logRpg(`You cast a spell and deal ${damage} magic damage.`);
+        updateRpgDisplay();
+        if (enemyHP === 0) { endBattle("win"); return; }
+        enemyTurn();
+      });
+
+      // Player action: Heal - consumes MP
+      document.getElementById("heal-btn").addEventListener("click", function () {
+        if (!gameActive) return;
+        if (playerMP < 8) {
+          logRpg("Not enough MP to heal!");
+          return;
+        }
+        playerMP -= 8;
+        // Heal: 18-28 HP restored
+        const healAmount = Math.floor(Math.random() * 11) + 18;
+        playerHP = Math.min(playerHP + healAmount, playerMaxHP);
+        logRpg(`You heal yourself for ${healAmount} HP.`);
+        updateRpgDisplay();
+        enemyTurn();
+      });
+
+      function enemyTurn() {
+        // Enemy takes its turn after a short delay
+        setTimeout(() => {
+          if (!gameActive) return;
+          // Enemy randomly decides between attack or a special move
+          let action = Math.random();
+          if (action < 0.8) {
+            // Basic attack: 10-20 damage
+            const damage = Math.floor(Math.random() * 11) + 10;
+            playerHP = Math.max(playerHP - damage, 0);
+            logRpg(`The enemy attacks you for ${damage} damage.`);
+          } else {
+            // Rare special attack: 25-35 damage
+            const damage = Math.floor(Math.random() * 11) + 25;
+            playerHP = Math.max(playerHP - damage, 0);
+            logRpg(`The enemy unleashes a powerful strike for ${damage} damage!`);
+          }
+          updateRpgDisplay();
+          if (playerHP === 0) { endBattle("lose"); }
+        }, 1000);
+      }
+
+      function endBattle(result) {
+        gameActive = false;
+        if (result === "win") {
+          logRpg("Congratulations, you defeated the enemy!");
+        } else {
+          logRpg("You have been defeated. Better luck next time!");
+        }
+        document.getElementById("rpg-restart-btn").style.display = "inline-block";
+      }
+
+      document.getElementById("rpg-restart-btn").addEventListener("click", function () {
+        startAdvancedRpg();
+      });
+    </script>
+  </body>
+</html>
